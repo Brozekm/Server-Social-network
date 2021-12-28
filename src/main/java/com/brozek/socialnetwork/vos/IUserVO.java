@@ -1,7 +1,7 @@
 package com.brozek.socialnetwork.vos;
 
 
-public interface IUserVo {
+public interface IUserVO {
 
     String getEmail();
 

@@ -1,6 +1,6 @@
 package com.brozek.socialnetwork.vos.impl;
 
-import com.brozek.socialnetwork.vos.IUserVo;
+import com.brozek.socialnetwork.vos.IUserVO;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
@@ -12,7 +12,7 @@ public record UserVO(
         @NotNull String firstName,
         @NotNull String surname,
         EnumUserRole role
-) implements IUserVo {
+) implements IUserVO {
     @Override
     public String getEmail() {
         return null;
