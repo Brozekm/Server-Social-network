@@ -8,4 +8,6 @@ public interface IUserService {
 
     Set<IUserVO> getAllUsers();
 
+
+    IUserVO findUserByEmail(String email);
 }

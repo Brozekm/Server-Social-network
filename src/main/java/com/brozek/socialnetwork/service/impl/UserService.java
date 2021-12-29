@@ -41,4 +41,21 @@ public class UserService implements IUserService {
 
         return users;
     }
+
+    @Override
+    public IUserVO findUserByEmail(String email) {
+        var userDO = userRepository.findUserWithRoleByEmail(email);
+        if (userDO == null){
+            log.info("User email was not found {}.", email);
+            return null;
+        }
+
+        return new UserVO(
+                userDO.getEmail(),
+                userDO.getPassword(),
+                userDO.getFirstName(),
+                userDO.getSurname(),
+                IUserVO.EnumUserRole.user
+        );
+    }
 }

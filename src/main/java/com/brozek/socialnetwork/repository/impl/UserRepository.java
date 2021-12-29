@@ -5,6 +5,7 @@ import com.brozek.socialnetwork.dos.impl.UserDO;
 import com.brozek.socialnetwork.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.CustomSQLErrorCodesTranslation;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -32,5 +33,24 @@ public class UserRepository implements IUserRepository {
         }
 
         return users;
+    }
+
+    @Override
+    public IUserDO findUserWithRoleByEmail(String email) {
+        final List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT * FROM auth_user au WHERE au.email = ?", email);
+
+        if (result.isEmpty()){
+            return null;
+        }
+
+        final Map<String, Object> userRaw = result.get(0);
+        return new UserDO(
+                (UUID) userRaw.get("id"),
+                (String) userRaw.get("email"),
+                (String) userRaw.get("password"),
+                (String) userRaw.get("first_name"),
+                (String) userRaw.get("surname"),
+                IUserDO.EnumUserRole.user
+        );
     }
 }

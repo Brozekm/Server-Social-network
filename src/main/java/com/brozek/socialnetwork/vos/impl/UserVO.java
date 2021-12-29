@@ -15,26 +15,26 @@ public record UserVO(
 ) implements IUserVO {
     @Override
     public String getEmail() {
-        return null;
+        return email;
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override
     public String getFirstName() {
-        return null;
+        return firstName;
     }
 
     @Override
     public String getSurname() {
-        return null;
+        return surname;
     }
 
     @Override
     public EnumUserRole getRole() {
-        return null;
+        return role;
     }
 }

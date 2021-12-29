@@ -8,4 +8,5 @@ public interface IUserRepository {
 
     Set<IUserDO> getAllUsers();
 
+    IUserDO findUserWithRoleByEmail(String email);
 }
