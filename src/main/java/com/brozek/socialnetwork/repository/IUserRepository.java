@@ -9,4 +9,8 @@ public interface IUserRepository {
     Set<IUserDO> getAllUsers();
 
     IUserDO findUserWithRoleByEmail(String email);
+
+    boolean registerUser(IUserDO userDO);
+
+    boolean isEmailTaken(String email);
 }

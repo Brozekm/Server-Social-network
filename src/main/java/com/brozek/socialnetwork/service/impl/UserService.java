@@ -1,6 +1,7 @@
 package com.brozek.socialnetwork.service.impl;
 
 import com.brozek.socialnetwork.dos.IUserDO;
+import com.brozek.socialnetwork.dos.impl.UserDO;
 import com.brozek.socialnetwork.repository.IUserRepository;
 import com.brozek.socialnetwork.service.IUserService;
 import com.brozek.socialnetwork.vos.IUserVO;
@@ -55,7 +56,15 @@ public class UserService implements IUserService {
                 userDO.getPassword(),
                 userDO.getFirstName(),
                 userDO.getSurname(),
-                IUserVO.EnumUserRole.user
+                IUserVO.EnumUserRole.valueOf(userDO.getRole().name())
         );
+    }
+
+    @Override
+    public boolean createUser(String email, String password, String firstName, String surname) {
+        //TODO VALIDATE
+        IUserDO userDO = new UserDO(email,password,firstName,surname);
+
+        return userRepository.registerUser(userDO);
     }
 }

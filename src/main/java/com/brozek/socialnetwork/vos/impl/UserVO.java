@@ -13,6 +13,7 @@ public record UserVO(
         @NotNull String surname,
         EnumUserRole role
 ) implements IUserVO {
+
     @Override
     public String getEmail() {
         return email;

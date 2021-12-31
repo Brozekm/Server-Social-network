@@ -10,4 +10,6 @@ public interface IUserService {
 
 
     IUserVO findUserByEmail(String email);
+
+    boolean createUser(String email, String password, String firstName, String surname);
 }

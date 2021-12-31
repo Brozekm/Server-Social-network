@@ -31,6 +31,13 @@ public class UserDO implements IUserDO {
         this.password = password;
     }
 
+    public UserDO(String email, String password, String firstName, String surname) {
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.surname = surname;
+    }
+
     public UserDO(UUID id, String email, String password, String firstName, String surname) {
         this.id = id;
         this.email = email;
