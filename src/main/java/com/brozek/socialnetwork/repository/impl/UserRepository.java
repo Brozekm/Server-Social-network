@@ -3,14 +3,18 @@ package com.brozek.socialnetwork.repository.impl;
 import com.brozek.socialnetwork.dos.IUserDO;
 import com.brozek.socialnetwork.dos.impl.UserDO;
 import com.brozek.socialnetwork.repository.IUserRepository;
+import com.brozek.socialnetwork.validation.exception.TakenEmailException;
+import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.CustomSQLErrorCodesTranslation;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
@@ -22,11 +26,19 @@ public class UserRepository implements IUserRepository {
 
     private SimpleJdbcInsert userInsert;
 
+    private SimpleJdbcInsert roleInsert;
+
+    private List<Map<String, Object>> roles;
+
     @PostConstruct
     public void init() {
         userInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("auth_user")
                 .usingGeneratedKeyColumns("id");
+        roleInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("auth_user_role");
+
+        roles = new ArrayList<>();
     }
 
     @Override
@@ -73,9 +85,12 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public boolean registerUser(@NotNull IUserDO userDO) {
+    @Transactional
+    public void registerUser(@NotNull IUserDO userDO) throws TakenEmailException {
+        Assert.notNull(userDO,"User object is null");
+
         if (isEmailTaken(userDO.getEmail())){
-            return false;
+            throw new TakenEmailException("Email is taken");
         }
 
         var parameters = new HashMap<String, Object>(4);
@@ -86,12 +101,36 @@ public class UserRepository implements IUserRepository {
 
         KeyHolder userKeyHolder = userInsert.executeAndReturnKeyHolder(parameters);
         if (userKeyHolder.getKeyList().isEmpty()){
-            return false;
+            throw new RuntimeException("User was not created successful");
         }
-        var userId = (String) userKeyHolder.getKeyList().get(0).get("id");
+        var userId = (UUID) userKeyHolder.getKeyList().get(0).get("id");
+        var roleId = getRoleID(IUserDO.EnumUserRole.user);
+        if (roleId == null){
+            throw new RuntimeException("Role id not found");
+        }
 
-        //TODO add role to user
-        return true;
+        parameters = new HashMap<String, Object>(2);
+        parameters.put("user_id", userId);
+        parameters.put("role_id", roleId);
+
+        int resultInt = roleInsert.execute(parameters);
+        if (resultInt == 0){
+            throw new RuntimeException("Role was not added correctly");
+        }
+    }
+
+    private UUID getRoleID(IUserDO.EnumUserRole roleName){
+        if (this.roles.isEmpty()){
+            this.roles = jdbcTemplate.queryForList("SELECT * from auth_role");
+        }
+        for (var role: this.roles){
+            if (role.get("rolename") == null || role.get("id") == null)
+                return null;
+            if (role.get("rolename").equals(roleName.name())){
+                return (UUID) role.get("id");
+            }
+        }
+        return null;
     }
 
     @Override

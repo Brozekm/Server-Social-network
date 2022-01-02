@@ -19,18 +19,19 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
-    }
-
-    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException{
-        final var userDO = userRepository.findUserWithRoleByEmail(email);
+        final var userDO = userRepository.findUserWithRoleByEmail(username);
         if (userDO == null)
-            throw new UsernameNotFoundException("User's email was not found: " + email);
+            throw new UsernameNotFoundException("User's email was not found: " + username);
 
         return User.builder()
                 .username(userDO.getEmail())
                 .password(userDO.getPassword())
-                .authorities(userDO.getRole().name())
+                .authorities("ROLE_"+userDO.getRole().name())
                 .build();
+    }
+
+    public boolean doesUserExists(String email) throws UsernameNotFoundException{
+        //TODO validate email
+        return userRepository.isEmailTaken(email);
     }
 }

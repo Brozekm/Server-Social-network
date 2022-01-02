@@ -3,6 +3,7 @@ package com.brozek.socialnetwork.controller;
 import com.brozek.socialnetwork.config.auth.JwtTokenUtil;
 import com.brozek.socialnetwork.service.IUserService;
 import com.brozek.socialnetwork.service.impl.JwtUserDetailsService;
+import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import com.brozek.socialnetwork.vos.IUserVO;
 import com.brozek.socialnetwork.vos.impl.JwtRequestVO;
 import com.brozek.socialnetwork.vos.impl.LoginCredentialsVO;
@@ -38,27 +39,31 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerUser(@RequestBody @Valid RegisterCredentialsVO registerVO){
-        if (!userService.createUser(registerVO.getEmail(),
-                registerVO.getPassword(),
-                registerVO.getFirstName(),
-                registerVO.getSurname())){
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterCredentialsVO registerVO){
+        try {
+            if (!userService.createUser(registerVO.getEmail(),
+                    registerVO.getPassword(),
+                    registerVO.getFirstName(),
+                    registerVO.getSurname())){
+                return ResponseEntity.badRequest().build();
+            }
+        } catch (TakenEmailException e) {
+            return ResponseEntity.badRequest().body("Email is taken");
         }
 
         return ResponseEntity.ok(null);
     }
 
-
+    @CrossOrigin("http://localhost:4200/")
     @PostMapping("/login")
     public ResponseEntity<Object> loginUser(@RequestBody JwtRequestVO jwtRequestVO){
-        var userDetails = jwtUserDetailsService.loadUserByEmail(jwtRequestVO.getEmail());
+        var userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestVO.getEmail());
         if (userDetails == null){
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            authenticate(userDetails.getUsername(), userDetails.getPassword());
+            authenticate(jwtRequestVO.getEmail(), jwtRequestVO.getPassword());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

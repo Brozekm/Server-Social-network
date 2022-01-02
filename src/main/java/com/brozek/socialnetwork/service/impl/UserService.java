@@ -4,10 +4,12 @@ import com.brozek.socialnetwork.dos.IUserDO;
 import com.brozek.socialnetwork.dos.impl.UserDO;
 import com.brozek.socialnetwork.repository.IUserRepository;
 import com.brozek.socialnetwork.service.IUserService;
+import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import com.brozek.socialnetwork.vos.IUserVO;
 import com.brozek.socialnetwork.vos.impl.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -17,6 +19,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService implements IUserService {
+
+    private final PasswordEncoder passwordEncoder;
 
     private final IUserRepository userRepository;
 
@@ -61,10 +65,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean createUser(String email, String password, String firstName, String surname) {
+    public boolean createUser(String email, String password, String firstName, String surname) throws TakenEmailException {
         //TODO VALIDATE
-        IUserDO userDO = new UserDO(email,password,firstName,surname);
+        IUserDO userDO = new UserDO(email,passwordEncoder.encode(password),firstName,surname);
 
-        return userRepository.registerUser(userDO);
+        userRepository.registerUser(userDO);
+
+        return true;
     }
 }
