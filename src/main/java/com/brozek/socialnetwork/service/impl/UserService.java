@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -65,11 +66,18 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public boolean createUser(String email, String password, String firstName, String surname) throws TakenEmailException {
         //TODO VALIDATE
         IUserDO userDO = new UserDO(email,passwordEncoder.encode(password),firstName,surname);
 
-        userRepository.registerUser(userDO);
+        if (userRepository.isEmailTaken(userDO.getEmail())){
+            throw new TakenEmailException("Email is taken");
+        }
+
+        if (userRepository.registerUser(userDO) != 1){
+            throw  new RuntimeException("Error while creating new user");
+        }
 
         return true;
     }

@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface IUserDO {
 
-    UUID getId();
+    int getId();
 
     String getEmail();
 

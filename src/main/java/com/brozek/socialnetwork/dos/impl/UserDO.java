@@ -4,12 +4,11 @@ import com.brozek.socialnetwork.dos.IUserDO;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
 
 @Data
 @Builder
 public class UserDO implements IUserDO {
-    private UUID id;
+    private int id;
     private String email;
     private String password;
     private String firstName;
@@ -25,7 +24,7 @@ public class UserDO implements IUserDO {
         this.password = password;
     }
 
-    public UserDO(UUID id, String email, String password) {
+    public UserDO(int id, String email, String password) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -38,7 +37,7 @@ public class UserDO implements IUserDO {
         this.surname = surname;
     }
 
-    public UserDO(UUID id, String email, String password, String firstName, String surname) {
+    public UserDO(int id, String email, String password, String firstName, String surname) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -46,7 +45,7 @@ public class UserDO implements IUserDO {
         this.surname = surname;
     }
 
-    public UserDO(UUID id, String email, String password, String firstName, String surname, EnumUserRole role) {
+    public UserDO(int id, String email, String password, String firstName, String surname, EnumUserRole role) {
         this.id = id;
         this.email = email;
         this.password = password;
