@@ -3,6 +3,7 @@ package com.brozek.socialnetwork.service.impl;
 import com.brozek.socialnetwork.dos.IUserDO;
 import com.brozek.socialnetwork.dos.impl.UserDO;
 import com.brozek.socialnetwork.repository.IUserRepository;
+import com.brozek.socialnetwork.service.IAuthenticationService;
 import com.brozek.socialnetwork.service.IUserService;
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import com.brozek.socialnetwork.vos.IUserVO;
@@ -25,12 +26,15 @@ public class UserService implements IUserService {
 
     private final IUserRepository userRepository;
 
+    private final IAuthenticationService authenticationService;
+
     @Override
     public Set<IUserVO> getAllUsers() {
+        String userEmail = authenticationService.getUserEmail();
+
         var usersDB = userRepository.getAllUsers();
         if (usersDB.size() == 0){
             log.info("Neexistuje zadny uzivatel.");
-            //TODO Throw exception ? return null -> zkouska logovani
         }
 
         Set<IUserVO> users = new HashSet<>();

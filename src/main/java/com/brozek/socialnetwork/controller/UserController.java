@@ -33,6 +33,7 @@ public class UserController {
 
     @GetMapping("/getAllUsers")
     public ResponseEntity<Object> getAllUsersFromDB(){
+        
         var users = userService.getAllUsers();
 
         return ResponseEntity.ok(users);
@@ -54,7 +55,7 @@ public class UserController {
         return ResponseEntity.ok(null);
     }
 
-    @CrossOrigin("http://localhost:4200/")
+
     @PostMapping("/login")
     public ResponseEntity<JwtResponseVO> loginUser(@RequestBody JwtRequestVO jwtRequestVO){
         var jwtResponseCredentials = jwtUserDetailsService.loadUserByEmail(jwtRequestVO.getEmail());
