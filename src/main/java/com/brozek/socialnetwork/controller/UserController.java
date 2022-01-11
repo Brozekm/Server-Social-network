@@ -1,12 +1,13 @@
 package com.brozek.socialnetwork.controller;
 
 import com.brozek.socialnetwork.config.auth.JwtTokenUtil;
-import com.brozek.socialnetwork.vos.impl.JwtResponseVO;
+import com.brozek.socialnetwork.validation.exception.StringResponse;
+import com.brozek.socialnetwork.vos.JwtResponseVO;
 import com.brozek.socialnetwork.service.IUserService;
 import com.brozek.socialnetwork.service.impl.JwtUserDetailsService;
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
-import com.brozek.socialnetwork.vos.impl.JwtRequestVO;
-import com.brozek.socialnetwork.vos.impl.RegisterCredentialsVO;
+import com.brozek.socialnetwork.vos.JwtRequestVO;
+import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,25 +30,20 @@ public class UserController {
     private final JwtUserDetailsService jwtUserDetailsService;
 
 
-    @GetMapping("/getAllUsers")
-    public ResponseEntity<Object> getAllUsersFromDB(){
-        
-        var users = userService.getAllUsers();
-
-        return ResponseEntity.ok(users);
-    }
+//    @GetMapping("/getAllUsers")
+//    public ResponseEntity<Object> getAllUsersFromDB(){
+//
+//        var users = userService.getAllUsers();
+//
+//        return ResponseEntity.ok(users);
+//    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterCredentialsVO registerVO){
         try {
-            if (!userService.createUser(registerVO.getEmail(),
-                    registerVO.getPassword(),
-                    registerVO.getFirstName(),
-                    registerVO.getSurname())){
-                return ResponseEntity.badRequest().build();
-            }
+            userService.createUser(registerVO);
         } catch (TakenEmailException e) {
-            return ResponseEntity.badRequest().body("Email is taken");
+            return ResponseEntity.badRequest().body(new StringResponse("Email is taken"));
         }
 
         return ResponseEntity.ok(null);

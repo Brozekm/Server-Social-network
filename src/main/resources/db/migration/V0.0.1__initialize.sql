@@ -1,4 +1,4 @@
-create type user_role as enum ('admin', 'user');
+-- create type user_role as enum ('admin', 'user');
 create type friendship_status as enum ('new', 'rejected', 'blocked', 'friend');
 
 
@@ -7,9 +7,8 @@ create table if not exists auth_user
     id         SERIAL PRIMARY KEY,
     email      varchar(254) NOT NULL UNIQUE,
     "password" varchar(64)  NOT null,
-    first_name varchar(20)  not null,
-    surname    varchar(20)  not null,
-    "role" user_role not null default 'user'
+    user_name  varchar(20)  not null,
+    "role"     varchar(10) not null default 'user'
     );
 
 create table if not exists friendship

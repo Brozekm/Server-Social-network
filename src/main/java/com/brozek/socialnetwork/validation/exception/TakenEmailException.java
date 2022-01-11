@@ -4,4 +4,6 @@ public class TakenEmailException extends Exception{
     public TakenEmailException(String message) {
         super(message);
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.brozek.socialnetwork.vos.impl;
+package com.brozek.socialnetwork.vos;
 
 import org.springframework.security.core.userdetails.UserDetails;
 

@@ -1,4 +1,4 @@
-package com.brozek.socialnetwork.vos.impl;
+package com.brozek.socialnetwork.vos;
 
 import java.io.Serializable;
 
@@ -10,24 +10,17 @@ public class JwtResponseVO implements Serializable {
 
     private final String email;
 
-    private final String firstName;
-
-    private final String surname;
+    private final String userName;
 
 
-    public JwtResponseVO(String email, String firstName, String surname) {
+    public JwtResponseVO(String email, String userName) {
         this.email = email;
-        this.firstName = firstName;
-        this.surname = surname;
+        this.userName = userName;
     }
 
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getSurname() {
-        return surname;
+    public String getUserName() {
+        return userName;
     }
 
     public String getEmail() {

@@ -1,18 +1,13 @@
 package com.brozek.socialnetwork.service;
 
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
-import com.brozek.socialnetwork.vos.IUserVO;
+import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
+import javax.validation.Valid;
 
 public interface IUserService {
 
-    Set<IUserVO> getAllUsers();
-
-
-    IUserVO findUserByEmail(String email);
-
     @Transactional
-    boolean createUser(String email, String password, String firstName, String surname) throws TakenEmailException;
+    void createUser(@Valid RegisterCredentialsVO RegisterCredentialsVO) throws TakenEmailException;
 }
