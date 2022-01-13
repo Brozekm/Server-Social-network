@@ -1,15 +1,19 @@
 package com.brozek.socialnetwork.controller;
 
 import com.brozek.socialnetwork.config.auth.JwtTokenUtil;
+import com.brozek.socialnetwork.service.IFriendshipsService;
+import com.brozek.socialnetwork.service.impl.FriendshipsService;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.JwtResponseVO;
 import com.brozek.socialnetwork.service.IUserService;
 import com.brozek.socialnetwork.service.impl.JwtUserDetailsService;
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import com.brozek.socialnetwork.vos.JwtRequestVO;
+import com.brozek.socialnetwork.vos.NameLikeVO;
 import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
 import lombok.RequiredArgsConstructor;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,14 +33,6 @@ public class UserController {
     private final JwtTokenUtil jwtTokenUtil;
     private final JwtUserDetailsService jwtUserDetailsService;
 
-
-//    @GetMapping("/getAllUsers")
-//    public ResponseEntity<Object> getAllUsersFromDB(){
-//
-//        var users = userService.getAllUsers();
-//
-//        return ResponseEntity.ok(users);
-//    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterCredentialsVO registerVO){

@@ -9,11 +9,11 @@ import javax.persistence.*;
 @Getter
 public class AuthUserDO {
 
-    public static final String SEQUENCE_NAME = "auth_user_id_seq";
-    public static final String EMAIL = "email";
-    public static final String PASSWORD = "password";
-    public static final String USER_NAME = "user_name";
-    public static final String ROLE = "role";
+    private static final String SEQUENCE_NAME = "auth_user_id_seq";
+    private static final String EMAIL = "email";
+    private static final String PASSWORD = "password";
+    private static final String USER_NAME = "user_name";
+    private static final String ROLE = "role";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
@@ -31,12 +31,12 @@ public class AuthUserDO {
 
     @Enumerated(EnumType.STRING)
     @Column(name = ROLE, nullable = false)
-    private AuthRole role;
+    private EnumAuthRole role;
 
     public AuthUserDO() {
     }
 
-    public AuthUserDO(String email, String password, String userName, AuthRole role) {
+    public AuthUserDO(String email, String password, String userName, EnumAuthRole role) {
         this.email = email;
         this.password = password;
         this.userName = userName;

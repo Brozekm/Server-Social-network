@@ -1,6 +1,6 @@
 package com.brozek.socialnetwork.service.impl;
 
-import com.brozek.socialnetwork.dos.AuthRole;
+import com.brozek.socialnetwork.dos.EnumAuthRole;
 import com.brozek.socialnetwork.dos.AuthUserDO;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.service.IAuthenticationService;
@@ -35,7 +35,7 @@ public class UserService implements IUserService {
         AuthUserDO authUserDO = new AuthUserDO(registerCredentialsVO.getEmail(),
                 passwordEncoder.encode(registerCredentialsVO.getPassword()),
                 registerCredentialsVO.getUserName(),
-                AuthRole.user);
+                EnumAuthRole.USER);
 
         if (userJpaRepository.existsByEmail(authUserDO.getEmail())){
             log.info("Email ({}) is taken", registerCredentialsVO.getEmail());

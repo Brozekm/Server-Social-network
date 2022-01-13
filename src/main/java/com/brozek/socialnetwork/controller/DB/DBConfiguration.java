@@ -1,6 +1,6 @@
 package com.brozek.socialnetwork.controller.DB;
 
-import com.brozek.socialnetwork.dos.AuthRole;
+import com.brozek.socialnetwork.dos.EnumAuthRole;
 import com.brozek.socialnetwork.dos.AuthUserDO;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,9 @@ public class DBConfiguration implements InitializingBean {
     private final IUserJpaRepository userJpaRepository;
 
     private final String admin_email = "admin@gmail.com";
+
     private final String admin_username = "admin";
+
     private final String admin_password = "Admin12345";
 
 
@@ -32,7 +34,7 @@ public class DBConfiguration implements InitializingBean {
     }
 
     private void createAdmin() {
-        AuthUserDO authUserDO = new AuthUserDO(admin_email, passwordEncoder.encode(admin_password), admin_username, AuthRole.admin);
+        AuthUserDO authUserDO = new AuthUserDO(admin_email, passwordEncoder.encode(admin_password), admin_username, EnumAuthRole.ADMIN);
         userJpaRepository.save(authUserDO);
         log.info("Default admin account created, email: {}, password: {}", admin_email, admin_password);
     }
