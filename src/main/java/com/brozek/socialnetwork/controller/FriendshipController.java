@@ -7,10 +7,7 @@ import com.brozek.socialnetwork.vos.NameLikeVO;
 import com.brozek.socialnetwork.vos.PotentialFriendsVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -33,6 +30,41 @@ public class FriendshipController {
             friendshipsService.sendFriendshipRequest(emailVO);
         } catch (StringResponse e) {
             return ResponseEntity.badRequest().body(e.getResponse());
+        } catch (IllegalStateException | IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(null);
+    }
+
+    @PostMapping("/acceptFriendship")
+    public ResponseEntity<?> acceptFriendshipRequest(@RequestBody @Valid final EmailVO emailVO){
+        try{
+            friendshipsService.acceptFriendship(emailVO);
+        }catch (IllegalStateException e){
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(null);
+    }
+
+    @DeleteMapping("/deleteRelationship")
+    public ResponseEntity<?> deleteRelationship(@RequestBody @Valid final EmailVO emailVO){
+        try{
+            friendshipsService.deleteFriendship(emailVO);
+        }catch (IllegalStateException e){
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(null);
+    }
+
+    @PostMapping("/blockFriendship")
+    public ResponseEntity<?> blockFriendship(@RequestBody @Valid final EmailVO emailVO){
+        try{
+            friendshipsService.blockFriend(emailVO);
+        }catch (IllegalStateException e){
+            return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok(null);

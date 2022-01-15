@@ -1,5 +1,4 @@
 package com.brozek.socialnetwork.repository;
-
 import com.brozek.socialnetwork.dos.FriendshipDO;
 import com.brozek.socialnetwork.dos.ISearchResultDO;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,5 +26,11 @@ public interface IFriendshipRepository extends JpaRepository<FriendshipDO, Integ
             "where (f.source.email = ?1 or f.target.email = ?1)" +
             "and (f.source.email = ?2 or f.target.email = ?2)")
     boolean doUsersHaveRelationship(String firstUser, String secUser);
+
+
+    @Query(value = "select f from friendship f " +
+            "where (f.source.email = ?1 or f.target.email = ?1) " +
+            "and (f.source.email = ?2 or f.target.email = ?2)")
+    FriendshipDO getRelationshipByEmails(String first, String second);
 
 }

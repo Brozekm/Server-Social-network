@@ -31,6 +31,7 @@ public class FriendshipDO {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private AuthUserDO target;
 
+    @Enumerated(EnumType.STRING)
     @Column(
             name = STATUS,
             nullable = false
@@ -50,5 +51,17 @@ public class FriendshipDO {
     private LocalDateTime updatedAt;
 
     public FriendshipDO() {
+    }
+
+    public FriendshipDO(AuthUserDO source, AuthUserDO target) {
+        this.source = source;
+        this.target = target;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.status = EnumFriendshipStatus.NEW;
+    }
+
+    public void setStatus(EnumFriendshipStatus status) {
+        this.status = status;
     }
 }

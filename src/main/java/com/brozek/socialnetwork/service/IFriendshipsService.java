@@ -4,7 +4,6 @@ import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.NameLikeVO;
 import com.brozek.socialnetwork.vos.PotentialFriendsVO;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,6 +16,13 @@ public interface IFriendshipsService {
     @Transactional
     void sendFriendshipRequest(EmailVO targetEmail) throws StringResponse;
 
-    boolean deleteFriendship(String targetEmail);
+    @Transactional
+    void deleteFriendship(EmailVO targetEmail);
+
+    @Transactional
+    void acceptFriendship(EmailVO targetEmail);
+
+    @Transactional
+    void blockFriend(EmailVO targetEmail);
 
 }
