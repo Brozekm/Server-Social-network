@@ -11,13 +11,17 @@ import java.util.List;
 
 public interface IFriendshipsService {
 
-    List<PotentialFriendsVO> searchForUsersLike(NameLikeVO nameLikeVO);
+    @Transactional
+    List<PotentialFriendsVO> searchForUsersLike(String nameLikeVO);
+
+    @Transactional
+    List<PotentialFriendsVO> getFriendRequests();
 
     @Transactional
     void sendFriendshipRequest(EmailVO targetEmail) throws StringResponse;
 
     @Transactional
-    void deleteFriendship(EmailVO targetEmail);
+    void deleteFriendship(String targetEmail);
 
     @Transactional
     void acceptFriendship(EmailVO targetEmail);

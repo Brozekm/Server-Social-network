@@ -19,9 +19,20 @@ public class FriendshipController {
     private final IFriendshipsService friendshipsService;
 
     @GetMapping("/findUsersLike")
-    public ResponseEntity<?> findUserWithNameLike(@RequestBody @Valid final NameLikeVO nameLikeVO){
-        List<PotentialFriendsVO> potentialFriendsVOS = friendshipsService.searchForUsersLike(nameLikeVO);
+    public ResponseEntity<?> findUserWithNameLike(@RequestParam String name){
+        List<PotentialFriendsVO> potentialFriendsVOS = friendshipsService.searchForUsersLike(name);
         return ResponseEntity.ok(potentialFriendsVOS);
+    }
+
+    @GetMapping("/getFriendshipRequests")
+    public ResponseEntity<?> getNewFriendRequests(){
+        List<PotentialFriendsVO> friendRequests;
+        try{
+            friendRequests = this.friendshipsService.getFriendRequests();
+        } catch (IllegalStateException e){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(friendRequests);
     }
 
     @PostMapping("/sendFriendshipRequest")
@@ -49,9 +60,9 @@ public class FriendshipController {
     }
 
     @DeleteMapping("/deleteRelationship")
-    public ResponseEntity<?> deleteRelationship(@RequestBody @Valid final EmailVO emailVO){
+    public ResponseEntity<?> deleteRelationship(@RequestParam String email){
         try{
-            friendshipsService.deleteFriendship(emailVO);
+            friendshipsService.deleteFriendship(email);
         }catch (IllegalStateException e){
             return ResponseEntity.badRequest().build();
         }
