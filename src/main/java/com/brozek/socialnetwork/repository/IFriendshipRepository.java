@@ -21,6 +21,19 @@ public interface IFriendshipRepository extends JpaRepository<FriendshipDO, Integ
             "where f.status = 'NEW'", nativeQuery = true)
     List<ISearchResultDO> getUsersFriendshipRequest(String email);
 
+    @Query(value = "select au.email as email, au.user_name as userName from auth_user au " +
+            "inner join friendship f on au.id in (f.sourceid, f.targetid) " +
+            "and (select id from auth_user where email = ?1) in (f.targetid, f.sourceid) " +
+            "where f.status = 'FRIEND' " +
+            "and au.email != ?1", nativeQuery = true)
+    List<ISearchResultDO> getUsersFriends(String email);
+
+    @Query(value = "select au.email as email, au.user_name as userName from auth_user au " +
+            "inner join friendship f on au.id = f.sourceid " +
+            "and (select id from auth_user where email = ?1) = f.targetid " +
+            "where f.status = 'BLOCKED'", nativeQuery = true)
+    List<ISearchResultDO> getUsersBlockedUsers(String email);
+
 
     @Query(value = "select case when count(f) > 0 then true else false end from friendship f " +
             "where (f.source.email = ?1 or f.target.email = ?1)" +

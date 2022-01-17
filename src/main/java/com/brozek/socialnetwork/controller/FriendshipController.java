@@ -3,8 +3,7 @@ package com.brozek.socialnetwork.controller;
 import com.brozek.socialnetwork.service.IFriendshipsService;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
-import com.brozek.socialnetwork.vos.NameLikeVO;
-import com.brozek.socialnetwork.vos.PotentialFriendsVO;
+import com.brozek.socialnetwork.vos.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +19,13 @@ public class FriendshipController {
 
     @GetMapping("/findUsersLike")
     public ResponseEntity<?> findUserWithNameLike(@RequestParam String name){
-        List<PotentialFriendsVO> potentialFriendsVOS = friendshipsService.searchForUsersLike(name);
-        return ResponseEntity.ok(potentialFriendsVOS);
+        List<UserVO> userVOS = friendshipsService.searchForUsersLike(name);
+        return ResponseEntity.ok(userVOS);
     }
 
     @GetMapping("/getFriendshipRequests")
     public ResponseEntity<?> getNewFriendRequests(){
-        List<PotentialFriendsVO> friendRequests;
+        List<UserVO> friendRequests;
         try{
             friendRequests = this.friendshipsService.getFriendRequests();
         } catch (IllegalStateException e){
@@ -34,6 +33,30 @@ public class FriendshipController {
         }
         return ResponseEntity.ok(friendRequests);
     }
+
+    @GetMapping("/getBlockedUsers")
+    public ResponseEntity<?> getBlockedUsers(){
+        List<UserVO> blockedUsers;
+        try{
+            blockedUsers = this.friendshipsService.getBlockedUsers();
+        } catch (IllegalStateException e){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(blockedUsers);
+    }
+
+    @GetMapping("/getFriends")
+    public ResponseEntity<?> getFriendList(){
+        List<UserVO> friends;
+        try{
+            friends = this.friendshipsService.getFriends();
+        } catch (IllegalStateException e){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(friends);
+    }
+    
+    
 
     @PostMapping("/sendFriendshipRequest")
     public ResponseEntity<?> sendFriendshipRequest(@RequestBody @Valid final EmailVO emailVO){
@@ -48,7 +71,7 @@ public class FriendshipController {
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/acceptFriendship")
+    @PutMapping("/acceptFriendship")
     public ResponseEntity<?> acceptFriendshipRequest(@RequestBody @Valid final EmailVO emailVO){
         try{
             friendshipsService.acceptFriendship(emailVO);
@@ -70,8 +93,19 @@ public class FriendshipController {
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/blockFriendship")
+    @PutMapping("/blockUser")
     public ResponseEntity<?> blockFriendship(@RequestBody @Valid final EmailVO emailVO){
+        try{
+            friendshipsService.blockFriend(emailVO);
+        }catch (IllegalStateException e){
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(null);
+    }
+
+    @PutMapping("/unblockUser")
+    public ResponseEntity<?> unblockFriendship(@RequestBody @Valid final EmailVO emailVO){
         try{
             friendshipsService.blockFriend(emailVO);
         }catch (IllegalStateException e){

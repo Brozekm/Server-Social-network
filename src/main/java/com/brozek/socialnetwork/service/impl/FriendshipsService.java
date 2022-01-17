@@ -10,8 +10,7 @@ import com.brozek.socialnetwork.service.IAuthenticationService;
 import com.brozek.socialnetwork.service.IFriendshipsService;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
-import com.brozek.socialnetwork.vos.NameLikeVO;
-import com.brozek.socialnetwork.vos.PotentialFriendsVO;
+import com.brozek.socialnetwork.vos.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,67 +30,95 @@ public class FriendshipsService implements IFriendshipsService {
     private final IAuthenticationService authenticationService;
 
     @Override
-    public List<PotentialFriendsVO> searchForUsersLike(String nameLikeVO) {
+    public List<UserVO> searchForUsersLike(String nameLikeVO) {
         final String loggedUserEmail = authenticationService.getUserEmail();
         log.debug("{} is looking for friends named: {}", loggedUserEmail, nameLikeVO);
 
-        var searchString = "%"+nameLikeVO.toLowerCase()+"%";
+        var searchString = "%" + nameLikeVO.toLowerCase() + "%";
         List<ISearchResultDO> searchResults = friendshipRepository.searchForUsernameLike(searchString, loggedUserEmail);
-        List<PotentialFriendsVO> potentialFriends = new ArrayList<>();
-        for (var oneResult: searchResults){
+        List<UserVO> potentialFriends = new ArrayList<>();
+        for (var oneResult : searchResults) {
             String s = oneResult.getFriendStatus();
             log.info("Friend status: {}", oneResult.getFriendStatus());
-            PotentialFriendsVO poFriend = new PotentialFriendsVO(oneResult.getEmail(), oneResult.getUserName());
+            UserVO poFriend = new UserVO(oneResult.getEmail(), oneResult.getUserName());
             potentialFriends.add(poFriend);
         }
         return potentialFriends;
     }
 
     @Override
-    public List<PotentialFriendsVO> getFriendRequests() {
+    public List<UserVO> getFriendRequests() {
         String loggedUser = authenticationService.getUserEmail();
-        if (loggedUser == null){
+        if (loggedUser == null) {
             log.warn("User is not logged after passing authentication");
             throw new IllegalStateException("User is not logged");
         }
         List<ISearchResultDO> searchResults = friendshipRepository.getUsersFriendshipRequest(loggedUser);
-        List<PotentialFriendsVO> friendRequests = new ArrayList<>();
-        for (var oneResult: searchResults){
-            String s = oneResult.getFriendStatus();
-            PotentialFriendsVO poFriend = new PotentialFriendsVO(oneResult.getEmail(), oneResult.getUserName());
-            friendRequests.add(poFriend);
-        }
 
-        return friendRequests;
+        return mapISearchDOToUserVO(searchResults);
+    }
+
+    @Override
+    public List<UserVO> getFriends() {
+        String loggedUser = authenticationService.getUserEmail();
+        if (loggedUser == null) {
+            log.warn("User is not logged after passing authentication");
+            throw new IllegalStateException("User is not logged");
+        }
+        List<ISearchResultDO> searchResults = friendshipRepository.getUsersFriends(loggedUser);
+
+        return mapISearchDOToUserVO(searchResults);
+    }
+
+    @Override
+    public List<UserVO> getBlockedUsers() {
+        String loggedUser = authenticationService.getUserEmail();
+        if (loggedUser == null) {
+            log.warn("User is not logged after passing authentication");
+            throw new IllegalStateException("User is not logged");
+        }
+        List<ISearchResultDO> searchResults = friendshipRepository.getUsersBlockedUsers(loggedUser);
+
+        return mapISearchDOToUserVO(searchResults);
+    }
+
+    private List<UserVO> mapISearchDOToUserVO(List<ISearchResultDO> searchResults) {
+        List<UserVO> users = new ArrayList<>();
+        for (var oneResult : searchResults) {
+            String s = oneResult.getFriendStatus();
+            UserVO poFriend = new UserVO(oneResult.getEmail(), oneResult.getUserName());
+            users.add(poFriend);
+        }
+        return users;
     }
 
     @Override
     public void sendFriendshipRequest(EmailVO targetEmail) throws StringResponse {
         String loggedUser = authenticationService.getUserEmail();
-        if (loggedUser == null){
+        if (loggedUser == null) {
             log.warn("User is not logged after passing authentication");
             throw new IllegalStateException("User is not logged");
         }
 
         log.debug("Creating new friendship between {} and {}", loggedUser, targetEmail.getEmail());
-        if (loggedUser.equals(targetEmail.getEmail())){
+        if (loggedUser.equals(targetEmail.getEmail())) {
             throw new StringResponse("Are you really that lonely?");
         }
 
-        if (friendshipRepository.doUsersHaveRelationship(loggedUser, targetEmail.getEmail())){
+        if (friendshipRepository.doUsersHaveRelationship(loggedUser, targetEmail.getEmail())) {
             throw new IllegalStateException("Users already have relationship");
         }
 
         List<AuthUserDO> users = userJpaRepository.findByEmailIn(List.of(loggedUser, targetEmail.getEmail()));
 
-        if (users.size() != 2){
+        if (users.size() != 2) {
             throw new IllegalArgumentException("Targeted user do not exists");
         }
 
         FriendshipDO friendshipDO;
-        if (users.get(0).getEmail().equals(loggedUser)){
+        if (users.get(0).getEmail().equals(loggedUser)) {
             friendshipDO = new FriendshipDO(users.get(0), users.get(1));
-        }else{
+        } else {
             friendshipDO = new FriendshipDO(users.get(1), users.get(0));
         }
 
@@ -102,17 +129,17 @@ public class FriendshipsService implements IFriendshipsService {
     @Override
     public void acceptFriendship(EmailVO targetEmail) {
         String loggedUser = authenticationService.getUserEmail();
-        if (loggedUser == null){
+        if (loggedUser == null) {
             log.warn("User is not logged after passing authentication");
             throw new IllegalStateException("User is not logged");
         }
         log.debug("User {} is accepting friendship from {}", loggedUser, targetEmail.getEmail());
 
         FriendshipDO friendship = friendshipRepository.getRelationshipByEmails(loggedUser, targetEmail.getEmail());
-        if (friendship == null){
+        if (friendship == null) {
             throw new IllegalStateException("Users do not have any relationship");
         }
-        if (friendship.getStatus() != EnumFriendshipStatus.NEW){
+        if (friendship.getStatus() != EnumFriendshipStatus.NEW) {
             throw new IllegalStateException("Relationship is not in NEW state, could not be accepted");
         }
 
@@ -123,39 +150,60 @@ public class FriendshipsService implements IFriendshipsService {
     @Override
     public void deleteFriendship(String targetEmail) {
         String loggedUser = authenticationService.getUserEmail();
-        if (loggedUser == null){
+        if (loggedUser == null) {
             log.warn("User is not logged after passing authentication");
             throw new IllegalStateException("User is not logged");
         }
         log.debug("User {} is deleting friendship with {}", loggedUser, targetEmail);
 
         FriendshipDO friendship = friendshipRepository.getRelationshipByEmails(loggedUser, targetEmail);
-        if (friendship == null){
+        if (friendship == null) {
             throw new IllegalStateException("Users do not have any relationship");
         }
 
         friendshipRepository.delete(friendship);
-        log.debug("{} deleted relationship with {}",loggedUser, targetEmail);
+        log.debug("{} deleted relationship with {}", loggedUser, targetEmail);
     }
 
     @Override
     public void blockFriend(EmailVO targetEmail) {
         String loggedUser = authenticationService.getUserEmail();
-        if (loggedUser == null){
+        if (loggedUser == null) {
             log.warn("User is not logged after passing authentication");
             throw new IllegalStateException("User is not logged");
         }
         log.debug("User {} is trying to block {}", loggedUser, targetEmail.getEmail());
 
         FriendshipDO friendship = friendshipRepository.getRelationshipByEmails(loggedUser, targetEmail.getEmail());
-        if (friendship == null){
+        if (friendship == null) {
             throw new IllegalStateException("Users do not have any relationship");
         }
-        if (friendship.getStatus() != EnumFriendshipStatus.FRIEND){
-            throw new IllegalStateException("User can block only friends");
+        if (friendship.getStatus() == EnumFriendshipStatus.BLOCKED) {
+            return;
         }
 
         friendship.setStatus(EnumFriendshipStatus.BLOCKED);
         log.debug("{} blocked {}", loggedUser, targetEmail.getEmail());
+    }
+
+    @Override
+    public void unblockFriend(EmailVO targetEmail) {
+        String loggedUser = authenticationService.getUserEmail();
+        if (loggedUser == null) {
+            log.warn("User is not logged after passing authentication");
+            throw new IllegalStateException("User is not logged");
+        }
+        log.debug("User {} is trying to unblock {}", loggedUser, targetEmail.getEmail());
+
+        FriendshipDO friendship = friendshipRepository.getRelationshipByEmails(loggedUser, targetEmail.getEmail());
+        if (friendship == null) {
+            throw new IllegalStateException("Users do not have any relationship");
+        }
+        if (friendship.getStatus() != EnumFriendshipStatus.BLOCKED) {
+            throw new IllegalStateException("User is trying to unblock someone who is not blocked");
+        }
+
+        friendship.setStatus(EnumFriendshipStatus.NEW);
+        log.debug("{} unblocked {}", loggedUser, targetEmail.getEmail());
     }
 }

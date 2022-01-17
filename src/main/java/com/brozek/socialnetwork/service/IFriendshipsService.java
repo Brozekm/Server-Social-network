@@ -2,8 +2,7 @@ package com.brozek.socialnetwork.service;
 
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
-import com.brozek.socialnetwork.vos.NameLikeVO;
-import com.brozek.socialnetwork.vos.PotentialFriendsVO;
+import com.brozek.socialnetwork.vos.UserVO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -12,10 +11,16 @@ import java.util.List;
 public interface IFriendshipsService {
 
     @Transactional
-    List<PotentialFriendsVO> searchForUsersLike(String nameLikeVO);
+    List<UserVO> searchForUsersLike(String nameLikeVO);
 
     @Transactional
-    List<PotentialFriendsVO> getFriendRequests();
+    List<UserVO> getFriendRequests();
+
+    @Transactional
+    List<UserVO> getFriends();
+
+    @Transactional
+    List<UserVO> getBlockedUsers();
 
     @Transactional
     void sendFriendshipRequest(EmailVO targetEmail) throws StringResponse;
@@ -28,5 +33,8 @@ public interface IFriendshipsService {
 
     @Transactional
     void blockFriend(EmailVO targetEmail);
+
+    @Transactional
+    void unblockFriend(EmailVO targetEmail);
 
 }
