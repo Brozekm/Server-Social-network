@@ -1,4 +1,4 @@
-package com.brozek.socialnetwork.dos;
+package com.brozek.socialnetwork.dos.auth;
 
 
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.brozek.socialnetwork.service.impl;
 
-import com.brozek.socialnetwork.dos.AuthUserDO;
+import com.brozek.socialnetwork.dos.auth.AuthUserDO;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.vos.JwtResponseCredentials;
 import com.brozek.socialnetwork.vos.JwtResponseVO;

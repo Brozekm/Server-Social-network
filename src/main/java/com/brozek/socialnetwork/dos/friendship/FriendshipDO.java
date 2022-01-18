@@ -1,5 +1,6 @@
-package com.brozek.socialnetwork.dos;
+package com.brozek.socialnetwork.dos.friendship;
 
+import com.brozek.socialnetwork.dos.auth.AuthUserDO;
 import lombok.Getter;
 
 import javax.persistence.*;

@@ -1,7 +1,7 @@
 package com.brozek.socialnetwork.controller.DB;
 
-import com.brozek.socialnetwork.dos.EnumAuthRole;
-import com.brozek.socialnetwork.dos.AuthUserDO;
+import com.brozek.socialnetwork.dos.auth.EnumAuthRole;
+import com.brozek.socialnetwork.dos.auth.AuthUserDO;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

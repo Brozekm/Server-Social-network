@@ -1,7 +1,7 @@
 package com.brozek.socialnetwork.service.impl;
 
-import com.brozek.socialnetwork.dos.EnumAuthRole;
-import com.brozek.socialnetwork.dos.AuthUserDO;
+import com.brozek.socialnetwork.dos.auth.EnumAuthRole;
+import com.brozek.socialnetwork.dos.auth.AuthUserDO;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.service.IAuthenticationService;
 import com.brozek.socialnetwork.service.IUserService;

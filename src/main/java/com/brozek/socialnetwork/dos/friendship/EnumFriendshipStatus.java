@@ -1,4 +1,4 @@
-package com.brozek.socialnetwork.dos;
+package com.brozek.socialnetwork.dos.friendship;
 
 public enum EnumFriendshipStatus {
     NEW,

@@ -1,7 +1,7 @@
-package com.brozek.socialnetwork.dos;
+package com.brozek.socialnetwork.dos.friendship;
 
 public interface ISearchResultDO {
     String getEmail();
     String getUserName();
-    String getFriendStatus();
+    String getStatus();
 }

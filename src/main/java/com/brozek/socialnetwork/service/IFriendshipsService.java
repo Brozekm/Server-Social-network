@@ -3,6 +3,7 @@ package com.brozek.socialnetwork.service;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.UserVO;
+import com.brozek.socialnetwork.vos.friendship.SearchFriendVO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public interface IFriendshipsService {
 
     @Transactional
-    List<UserVO> searchForUsersLike(String nameLikeVO);
+    List<SearchFriendVO> searchForUsersLike(String nameLikeVO);
 
     @Transactional
     List<UserVO> getFriendRequests();

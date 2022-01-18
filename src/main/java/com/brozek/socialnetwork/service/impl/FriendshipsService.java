@@ -1,9 +1,9 @@
 package com.brozek.socialnetwork.service.impl;
 
-import com.brozek.socialnetwork.dos.AuthUserDO;
-import com.brozek.socialnetwork.dos.EnumFriendshipStatus;
-import com.brozek.socialnetwork.dos.FriendshipDO;
-import com.brozek.socialnetwork.dos.ISearchResultDO;
+import com.brozek.socialnetwork.dos.auth.AuthUserDO;
+import com.brozek.socialnetwork.dos.friendship.EnumFriendshipStatus;
+import com.brozek.socialnetwork.dos.friendship.FriendshipDO;
+import com.brozek.socialnetwork.dos.friendship.ISearchResultDO;
 import com.brozek.socialnetwork.repository.IFriendshipRepository;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.service.IAuthenticationService;
@@ -11,6 +11,7 @@ import com.brozek.socialnetwork.service.IFriendshipsService;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.UserVO;
+import com.brozek.socialnetwork.vos.friendship.SearchFriendVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,17 +31,17 @@ public class FriendshipsService implements IFriendshipsService {
     private final IAuthenticationService authenticationService;
 
     @Override
-    public List<UserVO> searchForUsersLike(String nameLikeVO) {
+    public List<SearchFriendVO> searchForUsersLike(String nameLikeVO) {
         final String loggedUserEmail = authenticationService.getUserEmail();
         log.debug("{} is looking for friends named: {}", loggedUserEmail, nameLikeVO);
 
         var searchString = "%" + nameLikeVO.toLowerCase() + "%";
         List<ISearchResultDO> searchResults = friendshipRepository.searchForUsernameLike(searchString, loggedUserEmail);
-        List<UserVO> potentialFriends = new ArrayList<>();
+
+        List<SearchFriendVO> potentialFriends = new ArrayList<>();
         for (var oneResult : searchResults) {
-            String s = oneResult.getFriendStatus();
-            log.info("Friend status: {}", oneResult.getFriendStatus());
-            UserVO poFriend = new UserVO(oneResult.getEmail(), oneResult.getUserName());
+            var s = oneResult.getStatus();
+            SearchFriendVO poFriend = new SearchFriendVO(oneResult.getEmail(), oneResult.getUserName(), oneResult.getStatus());
             potentialFriends.add(poFriend);
         }
         return potentialFriends;
@@ -85,7 +86,6 @@ public class FriendshipsService implements IFriendshipsService {
     private List<UserVO> mapISearchDOToUserVO(List<ISearchResultDO> searchResults) {
         List<UserVO> users = new ArrayList<>();
         for (var oneResult : searchResults) {
-            String s = oneResult.getFriendStatus();
             UserVO poFriend = new UserVO(oneResult.getEmail(), oneResult.getUserName());
             users.add(poFriend);
         }

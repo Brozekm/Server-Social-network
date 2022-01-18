@@ -4,6 +4,7 @@ import com.brozek.socialnetwork.service.IFriendshipsService;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.UserVO;
+import com.brozek.socialnetwork.vos.friendship.SearchFriendVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class FriendshipController {
 
     @GetMapping("/findUsersLike")
     public ResponseEntity<?> findUserWithNameLike(@RequestParam String name){
-        List<UserVO> userVOS = friendshipsService.searchForUsersLike(name);
+        List<SearchFriendVO> userVOS = friendshipsService.searchForUsersLike(name);
         return ResponseEntity.ok(userVOS);
     }
 

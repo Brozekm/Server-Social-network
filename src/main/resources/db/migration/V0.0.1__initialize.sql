@@ -21,3 +21,12 @@ create table if not exists friendship
     updated_at timestamp NOT null default now(),
     unique (sourceId, targetId)
     );
+
+create table if not exists post
+(
+  id SERIAL primary key,
+  user_id int not null references auth_user(id),
+  class varchar(10) not null default 'USER',
+  created_at timestamp NOT null default now(),
+  message TEXT not null
+  );
