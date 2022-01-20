@@ -46,7 +46,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                 .authorities("ROLE_"+authUserDO.getRole().name())
                 .build();
 
-        var jwtResponseVO = new JwtResponseVO(authUserDO.getEmail(), authUserDO.getUserName());
+        var jwtResponseVO = new JwtResponseVO(authUserDO.getEmail(), authUserDO.getUserName(), authUserDO.getRole());
 
         return new JwtResponseCredentials(userDetails, jwtResponseVO);
     }

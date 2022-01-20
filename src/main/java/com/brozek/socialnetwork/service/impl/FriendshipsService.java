@@ -112,7 +112,7 @@ public class FriendshipsService implements IFriendshipsService {
         List<AuthUserDO> users = userJpaRepository.findByEmailIn(List.of(loggedUser, targetEmail.getEmail()));
 
         if (users.size() != 2) {
-            throw new IllegalArgumentException("Targeted user do not exists");
+            throw new IllegalArgumentException("Targeted user does not exist");
         }
 
         FriendshipDO friendshipDO;

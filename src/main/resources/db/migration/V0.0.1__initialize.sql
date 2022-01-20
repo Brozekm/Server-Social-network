@@ -25,8 +25,8 @@ create table if not exists friendship
 create table if not exists post
 (
   id SERIAL primary key,
-  user_id int not null references auth_user(id),
-  class varchar(10) not null default 'USER',
+  owner_id int not null references auth_user(id),
+  "type" varchar(15) not null default 'NORMAL',
   created_at timestamp NOT null default now(),
   message TEXT not null
   );

@@ -18,11 +18,13 @@ public class FriendshipController {
 
     private final IFriendshipsService friendshipsService;
 
+
     @GetMapping("/findUsersLike")
     public ResponseEntity<?> findUserWithNameLike(@RequestParam String name){
         List<SearchFriendVO> userVOS = friendshipsService.searchForUsersLike(name);
         return ResponseEntity.ok(userVOS);
     }
+
 
     @GetMapping("/getFriendshipRequests")
     public ResponseEntity<?> getNewFriendRequests(){
@@ -45,6 +47,7 @@ public class FriendshipController {
         }
         return ResponseEntity.ok(blockedUsers);
     }
+
 
     @GetMapping("/getFriends")
     public ResponseEntity<?> getFriendList(){
@@ -108,7 +111,7 @@ public class FriendshipController {
     @PutMapping("/unblockUser")
     public ResponseEntity<?> unblockFriendship(@RequestBody @Valid final EmailVO emailVO){
         try{
-            friendshipsService.blockFriend(emailVO);
+            friendshipsService.unblockFriend(emailVO);
         }catch (IllegalStateException e){
             return ResponseEntity.badRequest().build();
         }
