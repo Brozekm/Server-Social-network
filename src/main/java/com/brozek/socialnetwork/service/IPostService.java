@@ -4,6 +4,7 @@ import com.brozek.socialnetwork.dos.posts.EnumPostType;
 import com.brozek.socialnetwork.vos.post.PostResponseVO;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IPostService {
@@ -13,5 +14,8 @@ public interface IPostService {
 
     @Transactional
     List<PostResponseVO> getPosts(int offset);
+
+    @Transactional
+    List<PostResponseVO> getNewerPosts(LocalDateTime dateTime);
 
 }

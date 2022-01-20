@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,13 +72,32 @@ public class PostService implements IPostService {
             throw new IllegalArgumentException("Offset can not be negative number");
         }
 
-        List<IPostsDO> postsDO = postRepository.getPosts(2, offset);
-        var posts = new ArrayList<PostResponseVO>();
-        for (var tmpPost: postsDO){
-            var post = new PostResponseVO(tmpPost.getMessage(), tmpPost.getType());
-            posts.add(post);
+        return mapDOPostsToVO(postRepository.getPosts(loggedUser,10, offset));
+    }
+
+    @Override
+    public List<PostResponseVO> getNewerPosts(LocalDateTime dateTime) {
+        String loggedUser = authenticationService.getUserEmail();
+        if (loggedUser == null) {
+            log.warn("User is not logged after passing authentication");
+            throw new IllegalStateException("User is not logged");
         }
 
+        return mapDOPostsToVO(postRepository.getNewerPosts(loggedUser,dateTime));
+    }
+
+    private List<PostResponseVO> mapDOPostsToVO(List<IPostsDO> postsDOS) {
+        var posts = new ArrayList<PostResponseVO>();
+        for (var tmpPost: postsDOS){
+            var post = new PostResponseVO(tmpPost.getUsername(),
+                    tmpPost.getEmail(),
+                    tmpPost.getPostType(),
+                    tmpPost.getCreatedAt(),
+                    tmpPost.getMessage());
+            posts.add(post);
+        }
         return posts;
     }
+
+
 }
