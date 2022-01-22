@@ -1,6 +1,5 @@
 package com.brozek.socialnetwork.service.impl;
 
-import com.brozek.socialnetwork.dos.auth.AuthUserDO;
 import com.brozek.socialnetwork.dos.friendship.ISearchResultDO;
 import com.brozek.socialnetwork.repository.IFriendshipRepository;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
@@ -12,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WebSocketService {
+public class OnlineFriendsService {
 
     private Map<String, String> onlineUsers = new ConcurrentHashMap<>();
 
@@ -32,6 +32,8 @@ public class WebSocketService {
 
     private final IFriendshipRepository friendshipRepository;
 
+    private static final String DESTINATION_ONLINE_FRIENDS = "/queue/online-friends";
+
 
     @EventListener
     public void onNewConnection(SessionSubscribeEvent event) {
@@ -40,6 +42,23 @@ public class WebSocketService {
                 log.debug("{} subscribed for online friends", event.getUser().getName());
                 addNewOnlineAndNotify(event.getUser().getName());
             }
+        }
+    }
+
+    @EventListener
+    public void onDisconnect(SessionDisconnectEvent event){
+        if (event.getUser() != null){
+            log.debug("{} disconnected", event.getUser().getName());
+            notifyUsersAboutDisconnected(event.getUser().getName());
+        }
+    }
+
+    private void notifyUsersAboutDisconnected(String login) {
+        OnlineFriendVO disconnectingUserVO = new OnlineFriendVO(login, onlineUsers.get(login), EnumOnlineStatus.OFFLINE);
+        onlineUsers.remove(login);
+        List<ISearchResultDO> usersOnlineFriends = getOnlineFriends(login);
+        for (var onlineFriend: usersOnlineFriends){
+            simpMessagingTemplate.convertAndSendToUser(onlineFriend.getEmail(), DESTINATION_ONLINE_FRIENDS, List.of(disconnectingUserVO));
         }
     }
 
@@ -53,10 +72,10 @@ public class WebSocketService {
         for (var onlineFriend : usersOnlineFriends) {
             OnlineFriendVO ofVO = new OnlineFriendVO(onlineFriend.getEmail(), onlineFriend.getUserName(), EnumOnlineStatus.ONLINE);
             onlineFriendVOS.add(ofVO);
-            simpMessagingTemplate.convertAndSendToUser(onlineFriend.getEmail(), "/queue/online-friends", List.of(loggedUser));
+            simpMessagingTemplate.convertAndSendToUser(onlineFriend.getEmail(), DESTINATION_ONLINE_FRIENDS, List.of(loggedUser));
         }
 
-        simpMessagingTemplate.convertAndSendToUser(login, "/queue/online-friends", onlineFriendVOS);
+        simpMessagingTemplate.convertAndSendToUser(login, DESTINATION_ONLINE_FRIENDS, onlineFriendVOS);
 
         if (onlineUsers.get(login) == null) {
             onlineUsers.put(login, userName);
