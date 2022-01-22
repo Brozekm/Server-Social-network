@@ -38,23 +38,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken = null;
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
-        if(requestTokenHeader == null){
+        if (requestTokenHeader == null) {
             chain.doFilter(request, response);
             return;
         }
 
-        if (requestTokenHeader.startsWith(TOKEN_PREFIX)) {
-            jwtToken = requestTokenHeader.substring(TOKEN_PREFIX.length());
-            try {
-                email = jwtTokenUtil.getUsernameFromToken(jwtToken);
-            } catch (IllegalArgumentException e) {
-                log.info("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {
-                log.info("JWT Token has expired");
-            }
-        } else {
-            log.warn("JWT Token does not begin with Bearer String");
-        }
+        jwtToken = getTokenFromHeader(requestTokenHeader);
+
+        email = getEmailFromToken(jwtToken);
 
         // Once we get the token validate it.
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -77,4 +68,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         chain.doFilter(request, response);
     }
+
+    public String getEmailFromToken(String jwtToken) {
+        try {
+            return jwtTokenUtil.getUsernameFromToken(jwtToken);
+        } catch (IllegalArgumentException e) {
+            log.info("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            log.info("JWT Token has expired");
+        }
+        return null;
+    }
+
+    public String getTokenFromHeader(String requestTokenHeader) {
+        if (requestTokenHeader.startsWith(TOKEN_PREFIX)) {
+            return requestTokenHeader.substring(TOKEN_PREFIX.length());
+        } else {
+            log.warn("JWT Token does not begin with Bearer String");
+        }
+        return null;
+    }
+
+
 }

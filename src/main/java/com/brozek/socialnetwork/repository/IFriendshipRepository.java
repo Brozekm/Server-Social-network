@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Set;
 
 public interface IFriendshipRepository extends JpaRepository<FriendshipDO, Integer> {
 
@@ -27,6 +28,13 @@ public interface IFriendshipRepository extends JpaRepository<FriendshipDO, Integ
             "where f.status = 'FRIEND' " +
             "and au.email != ?1", nativeQuery = true)
     List<ISearchResultDO> getUsersFriends(String email);
+
+    @Query(value = "select au.email as email, au.user_name as userName from auth_user au " +
+            "inner join friendship f on au.id in (f.sourceid, f.targetid) " +
+            "and (select id from auth_user where email = ?1) in (f.targetid, f.sourceid) " +
+            "where f.status = 'FRIEND' " +
+            "and au.email in (?2)", nativeQuery = true)
+    List<ISearchResultDO> getUsersOnlineFriends(String email, Set<String> logins);
 
     @Query(value = "select au.email as email, au.user_name as userName from auth_user au " +
             "inner join friendship f on au.id = f.sourceid " +

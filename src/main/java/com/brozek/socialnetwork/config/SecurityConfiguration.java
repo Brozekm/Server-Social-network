@@ -35,6 +35,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String LOGIN_URI = "/login";
     private static final String REGISTER_URI = "/register";
 
+    private static final String SOCKET_URI = "/ws/**";
+
     private final PasswordEncoder passwordEncoder;
 
     private final JwtUserDetailsService jwtUserDetailsService;
@@ -59,6 +61,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URI, REGISTER_URI).permitAll()
+                .antMatchers(SOCKET_URI).permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
