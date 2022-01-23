@@ -16,11 +16,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class PostController {
+public class PostController implements IApiRestController {
 
     private final IPostService postService;
 
-    @PostMapping("/api/posts")
+    @PostMapping("/posts")
     public ResponseEntity<?> createPost(@RequestBody PostRequestVO postRequestVO) {
         try {
             postService.createPost(postRequestVO.getMessage(), postRequestVO.getType());
@@ -36,7 +36,7 @@ public class PostController {
     }
 
 
-    @GetMapping("/api/posts")
+    @GetMapping("/posts")
     public ResponseEntity<?> getPosts(@RequestParam int offset) {
         List<PostResponseVO> posts;
         try {
@@ -48,7 +48,7 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    @GetMapping("/api/posts/new")
+    @GetMapping("/posts/new")
     public ResponseEntity<?> getNewer(@RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from) {
         List<PostResponseVO> posts;
         try {
