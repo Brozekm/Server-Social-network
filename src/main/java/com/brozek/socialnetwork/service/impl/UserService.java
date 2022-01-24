@@ -8,6 +8,7 @@ import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.service.IAuthenticationService;
 import com.brozek.socialnetwork.service.IUserService;
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
+import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,14 @@ public class UserService implements IUserService {
         }
 
         userJpaRepository.save(authUserDO);
+    }
+
+    @Override
+    public boolean isEmailTaken(String email) {
+        if (email.length() < 3 || !new EmailValidator().isValid(email, null)){
+            throw new IllegalArgumentException("Email is not valid");
+        }
+        return userJpaRepository.existsByEmail(email);
     }
 
     private boolean validCredentials(RegisterCredentialsVO registerCredentialsVO) {

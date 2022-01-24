@@ -4,13 +4,10 @@ import com.brozek.socialnetwork.config.auth.JwtTokenUtil;
 import com.brozek.socialnetwork.service.IFriendshipsService;
 import com.brozek.socialnetwork.service.impl.FriendshipsService;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
-import com.brozek.socialnetwork.vos.JwtResponseVO;
+import com.brozek.socialnetwork.vos.*;
 import com.brozek.socialnetwork.service.IUserService;
 import com.brozek.socialnetwork.service.impl.JwtUserDetailsService;
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
-import com.brozek.socialnetwork.vos.JwtRequestVO;
-import com.brozek.socialnetwork.vos.NameLikeVO;
-import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
 import lombok.RequiredArgsConstructor;
 
 import org.hibernate.validator.constraints.Length;
@@ -35,23 +32,32 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterCredentialsVO registerVO){
+    public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterCredentialsVO registerVO) {
         try {
             userService.createUser(registerVO);
         } catch (TakenEmailException e) {
             return ResponseEntity.badRequest().body(new StringResponse("Email is taken"));
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
         return ResponseEntity.ok(null);
     }
 
+    @GetMapping("/register/email")
+    public ResponseEntity<?> isEmailTaken(@RequestParam @Valid String email) {
+        try {
+            return ResponseEntity.ok(userService.isEmailTaken(email));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Email is not valid");
+        }
+    }
+
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseVO> loginUser(@RequestBody JwtRequestVO jwtRequestVO){
+    public ResponseEntity<JwtResponseVO> loginUser(@RequestBody JwtRequestVO jwtRequestVO) {
         var jwtResponseCredentials = jwtUserDetailsService.loadUserByEmail(jwtRequestVO.getEmail());
-        if (jwtResponseCredentials == null){
+        if (jwtResponseCredentials == null) {
             return ResponseEntity.badRequest().build();
         }
 
