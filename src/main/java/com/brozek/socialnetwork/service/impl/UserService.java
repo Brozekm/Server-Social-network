@@ -1,7 +1,9 @@
 package com.brozek.socialnetwork.service.impl;
 
-import com.brozek.socialnetwork.dos.auth.EnumAuthRole;
 import com.brozek.socialnetwork.dos.auth.AuthUserDO;
+import com.brozek.socialnetwork.dos.auth.AuthUserRoleDO;
+import com.brozek.socialnetwork.dos.auth.EnumAuthUserRole;
+import com.brozek.socialnetwork.repository.IAuthRoleRepository;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.service.IAuthenticationService;
 import com.brozek.socialnetwork.service.IUserService;
@@ -9,9 +11,15 @@ import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +30,11 @@ public class UserService implements IUserService {
 
     private final IAuthenticationService authenticationService;
 
+    private final IAuthRoleRepository authRoleRepository;
+
     private final IUserJpaRepository userJpaRepository;
+
+    private Map<EnumAuthUserRole, Integer> authRoleMap;
 
 
     @Override
@@ -30,12 +42,14 @@ public class UserService implements IUserService {
     public void createUser(RegisterCredentialsVO registerCredentialsVO) throws TakenEmailException {
         log.info("New registration with email: {}", registerCredentialsVO.getEmail());
 
-        //TODO VALIDATE
+        if(!validCredentials(registerCredentialsVO)){
+            throw new IllegalArgumentException("Invalid credentials");
+        }
 
         AuthUserDO authUserDO = new AuthUserDO(registerCredentialsVO.getEmail(),
                 passwordEncoder.encode(registerCredentialsVO.getPassword()),
                 registerCredentialsVO.getUserName(),
-                EnumAuthRole.USER);
+                Set.of(getRoleFromEnum(EnumAuthUserRole.USER)));
 
         if (userJpaRepository.existsByEmail(authUserDO.getEmail())){
             log.info("Email ({}) is taken", registerCredentialsVO.getEmail());
@@ -44,4 +58,41 @@ public class UserService implements IUserService {
 
         userJpaRepository.save(authUserDO);
     }
+
+    private boolean validCredentials(RegisterCredentialsVO registerCredentialsVO) {
+        if(!new EmailValidator().isValid(registerCredentialsVO.getEmail(), null)){
+            return false;
+        }
+
+        if (registerCredentialsVO.getUserName().length() < 1 || registerCredentialsVO.getUserName().length() > 20){
+            return false;
+        }
+
+        boolean upper = false, lower = false, digit = false;
+        for (var character: registerCredentialsVO.getPassword().toCharArray()){
+            if (Character.isUpperCase(character)) upper = true;
+            if (Character.isLowerCase(character)) lower = true;
+            if (Character.isDigit(character)) digit = true;
+        }
+
+        return (upper && lower && digit);
+    }
+
+
+    private AuthUserRoleDO getRoleFromEnum(EnumAuthUserRole role){
+        if (this.authRoleMap == null){
+            getRoles();
+        }
+
+        return authRoleRepository.getById(this.authRoleMap.get(role));
+    }
+
+    private void getRoles() {
+        this.authRoleMap = new HashMap<>();
+        List<AuthUserRoleDO> listRole = this.authRoleRepository.findAll();
+        for(var role: listRole){
+            this.authRoleMap.put(role.getRoleName(), role.getId());
+        }
+    }
+
 }

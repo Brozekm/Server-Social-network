@@ -22,7 +22,6 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Map;
 
 

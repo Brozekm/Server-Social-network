@@ -19,7 +19,6 @@ public class FriendshipController implements IApiRestController{
     private final IFriendshipsService friendshipsService;
 
 
-    //    @GetMapping("/findUsersLike")
     @GetMapping("/users")
     public ResponseEntity<?> findUserWithNameLike(@RequestParam String nameLike) {
         List<SearchFriendVO> userVOS = friendshipsService.searchForUsersLike(nameLike);
@@ -27,7 +26,6 @@ public class FriendshipController implements IApiRestController{
     }
 
 
-    //    @GetMapping("/getFriendshipRequests")
     @GetMapping("/relationships/request")
     public ResponseEntity<?> getNewFriendRequests() {
         List<UserVO> friendRequests;
@@ -39,7 +37,6 @@ public class FriendshipController implements IApiRestController{
         return ResponseEntity.ok(friendRequests);
     }
 
-    //    @GetMapping("/getBlockedUsers")
     @GetMapping("/relationships/blocked")
     public ResponseEntity<?> getBlockedUsers() {
         List<UserVO> blockedUsers;
@@ -52,7 +49,6 @@ public class FriendshipController implements IApiRestController{
     }
 
 
-    //    @GetMapping("/getFriends")
     @GetMapping("/relationships/friend")
     public ResponseEntity<?> getFriendList() {
         List<UserVO> friends;
@@ -65,7 +61,6 @@ public class FriendshipController implements IApiRestController{
     }
 
 
-    //    @PostMapping("/sendFriendshipRequest")
     @PostMapping("/relationships/request")
     public ResponseEntity<?> sendFriendshipRequest(@RequestBody @Valid final EmailVO emailVO) {
         try {
@@ -79,7 +74,6 @@ public class FriendshipController implements IApiRestController{
         return ResponseEntity.ok(null);
     }
 
-    //    @PutMapping("/acceptFriendship")
     @PutMapping("/relationships/friend")
     public ResponseEntity<?> acceptFriendshipRequest(@RequestBody @Valid final EmailVO emailVO) {
         try {
@@ -91,7 +85,6 @@ public class FriendshipController implements IApiRestController{
         return ResponseEntity.ok(null);
     }
 
-    //    @DeleteMapping("/deleteRelationship")
     @DeleteMapping("/relationships")
     public ResponseEntity<?> deleteRelationship(@RequestParam String email) {
         try {
@@ -103,7 +96,6 @@ public class FriendshipController implements IApiRestController{
         return ResponseEntity.ok(null);
     }
 
-    //    @PutMapping("/blockUser")
     @PutMapping("/user/block")
     public ResponseEntity<?> blockFriendship(@RequestBody @Valid final EmailVO emailVO) {
         try {
@@ -115,7 +107,6 @@ public class FriendshipController implements IApiRestController{
         return ResponseEntity.ok(null);
     }
 
-    //    @PutMapping("/unblockUser")
     @PutMapping("/user/unblock")
     public ResponseEntity<?> unblockFriendship(@RequestBody @Valid final EmailVO emailVO) {
         try {

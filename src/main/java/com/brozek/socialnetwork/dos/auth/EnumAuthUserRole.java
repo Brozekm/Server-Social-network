@@ -1,6 +1,6 @@
 package com.brozek.socialnetwork.dos.auth;
 
-public enum EnumAuthRole {
+public enum EnumAuthUserRole {
     ADMIN,
     USER
 }

@@ -1,16 +1,20 @@
 package com.brozek.socialnetwork.service.impl;
 
 import com.brozek.socialnetwork.dos.auth.AuthUserDO;
+import com.brozek.socialnetwork.dos.auth.AuthUserRoleDO;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.vos.JwtResponseCredentials;
 import com.brozek.socialnetwork.vos.JwtResponseVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +33,12 @@ public class JwtUserDetailsService implements UserDetailsService {
         return User.builder()
                 .username(authUserDO.getEmail())
                 .password(authUserDO.getPassword())
-                .authorities("ROLE_"+authUserDO.getRole().name())
+                .authorities(authUserDO.getRoles().stream()
+                        .map(AuthUserRoleDO::getRoleName)
+                        .map(Enum::name)
+                        .map(name -> "ROLE_" + name)
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
@@ -43,10 +52,18 @@ public class JwtUserDetailsService implements UserDetailsService {
         var userDetails = User.builder()
                 .username(authUserDO.getEmail())
                 .password(authUserDO.getPassword())
-                .authorities("ROLE_"+authUserDO.getRole().name())
+                .authorities(authUserDO.getRoles().stream()
+                        .map(AuthUserRoleDO::getRoleName)
+                        .map(Enum::name)
+                        .map(name -> "ROLE_" + name)
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toSet()))
                 .build();
 
-        var jwtResponseVO = new JwtResponseVO(authUserDO.getEmail(), authUserDO.getUserName(), authUserDO.getRole());
+        var jwtResponseVO = new JwtResponseVO(authUserDO.getEmail(), authUserDO.getUserName(),
+                authUserDO.getRoles().stream()
+                        .map(AuthUserRoleDO::getRoleName)
+                        .collect(Collectors.toSet()));
 
         return new JwtResponseCredentials(userDetails, jwtResponseVO);
     }

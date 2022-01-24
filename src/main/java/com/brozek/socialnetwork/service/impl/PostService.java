@@ -1,7 +1,6 @@
 package com.brozek.socialnetwork.service.impl;
 
 import com.brozek.socialnetwork.dos.auth.AuthUserDO;
-import com.brozek.socialnetwork.dos.auth.EnumAuthRole;
 import com.brozek.socialnetwork.dos.posts.EnumPostType;
 import com.brozek.socialnetwork.dos.posts.IPostsDO;
 import com.brozek.socialnetwork.dos.posts.PostDO;
@@ -12,6 +11,8 @@ import com.brozek.socialnetwork.service.IPostService;
 import com.brozek.socialnetwork.vos.post.PostResponseVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -49,7 +50,7 @@ public class PostService implements IPostService {
 
 
         if (postType == EnumPostType.ANNOUNCEMENT){
-            if (user.getRole() != EnumAuthRole.ADMIN){
+            if (!authenticationService.isAdmin()){
                 log.warn("{} does not have privileges for creating announcements", loggedUser);
                 throw new IllegalAccessException("User does not have privileges for announcement");
             }

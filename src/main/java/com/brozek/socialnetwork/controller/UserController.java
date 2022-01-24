@@ -40,6 +40,8 @@ public class UserController {
             userService.createUser(registerVO);
         } catch (TakenEmailException e) {
             return ResponseEntity.badRequest().body(new StringResponse("Email is taken"));
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
         return ResponseEntity.ok(null);

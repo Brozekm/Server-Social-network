@@ -1,9 +1,10 @@
 package com.brozek.socialnetwork.vos;
 
-import com.brozek.socialnetwork.dos.auth.EnumAuthRole;
+import com.brozek.socialnetwork.dos.auth.EnumAuthUserRole;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.Set;
 
 @Getter
 public class JwtResponseVO implements Serializable {
@@ -16,13 +17,13 @@ public class JwtResponseVO implements Serializable {
 
     private final String userName;
 
-    private final EnumAuthRole role;
+    private final Set<EnumAuthUserRole> roles;
 
 
-    public JwtResponseVO(String email, String userName, EnumAuthRole role) {
+    public JwtResponseVO(String email, String userName, Set<EnumAuthUserRole> roles) {
         this.email = email;
         this.userName = userName;
-        this.role = role;
+        this.roles = roles;
     }
 
     public void setToken(String jwttoken) {

@@ -11,6 +11,9 @@ public interface IUserJpaRepository extends JpaRepository<AuthUserDO, Integer> {
 
     boolean existsByEmail(String email);
 
+    @Query(value = "select  au from auth_user au " +
+            "join fetch au.roles " +
+            "where au.email = ?1")
     AuthUserDO findByEmail(String email);
 
 
