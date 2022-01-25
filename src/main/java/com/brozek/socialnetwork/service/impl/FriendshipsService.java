@@ -11,6 +11,8 @@ import com.brozek.socialnetwork.service.IFriendshipsService;
 import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.UserVO;
+import com.brozek.socialnetwork.vos.chat.EnumOnlineStatus;
+import com.brozek.socialnetwork.vos.chat.OnlineFriendVO;
 import com.brozek.socialnetwork.vos.friendship.SearchFriendVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,8 @@ public class FriendshipsService implements IFriendshipsService {
     private final IUserJpaRepository userJpaRepository;
 
     private final IAuthenticationService authenticationService;
+
+    private final OnlineFriendsService onlineFriendsService;
 
     @Override
     public List<SearchFriendVO> searchForUsersLike(String nameLikeVO) {
@@ -135,7 +139,7 @@ public class FriendshipsService implements IFriendshipsService {
         }
         log.debug("User {} is accepting friendship from {}", loggedUser, targetEmail.getEmail());
 
-        FriendshipDO friendship = friendshipRepository.getRelationshipByEmails(loggedUser, targetEmail.getEmail());
+        FriendshipDO friendship = friendshipRepository.getRelationshipByEmailsFetchUsers(loggedUser, targetEmail.getEmail());
         if (friendship == null) {
             throw new IllegalStateException("Users do not have any relationship");
         }
@@ -144,7 +148,15 @@ public class FriendshipsService implements IFriendshipsService {
         }
 
         friendship.setStatus(EnumFriendshipStatus.FRIEND);
+
+        notifyIfOnline(friendship.getSource(), friendship.getTarget());
         log.debug("{} and {} are now friends", loggedUser, targetEmail.getEmail());
+    }
+
+    private void notifyIfOnline(AuthUserDO source, AuthUserDO target) {
+        OnlineFriendVO first = new OnlineFriendVO(source.getEmail(), source.getUserName(), EnumOnlineStatus.ONLINE);
+        OnlineFriendVO second = new OnlineFriendVO(target.getEmail(), target.getUserName(), EnumOnlineStatus.ONLINE);
+        this.onlineFriendsService.notifyAfterFriendshipIfBothOnline(first, second);
     }
 
     @Override

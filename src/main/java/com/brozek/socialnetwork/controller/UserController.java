@@ -11,6 +11,7 @@ import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import lombok.RequiredArgsConstructor;
 
 import org.hibernate.validator.constraints.Length;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,13 +36,14 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterCredentialsVO registerVO) {
         try {
             userService.createUser(registerVO);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (TakenEmailException e) {
             return ResponseEntity.badRequest().body(new StringResponse("Email is taken"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (StringResponse e) {
+            return ResponseEntity.ok("Weak password");
         }
-
-        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/register/email")

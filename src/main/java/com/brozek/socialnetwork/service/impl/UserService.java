@@ -7,9 +7,12 @@ import com.brozek.socialnetwork.repository.IAuthRoleRepository;
 import com.brozek.socialnetwork.repository.IUserJpaRepository;
 import com.brozek.socialnetwork.service.IAuthenticationService;
 import com.brozek.socialnetwork.service.IUserService;
+import com.brozek.socialnetwork.validation.exception.StringResponse;
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
+import com.nulabinc.zxcvbn.Strength;
+import com.nulabinc.zxcvbn.Zxcvbn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
@@ -40,7 +43,7 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public void createUser(RegisterCredentialsVO registerCredentialsVO) throws TakenEmailException {
+    public void createUser(RegisterCredentialsVO registerCredentialsVO) throws TakenEmailException, StringResponse {
         log.info("New registration with email: {}", registerCredentialsVO.getEmail());
 
         if(!validCredentials(registerCredentialsVO)){
@@ -68,13 +71,19 @@ public class UserService implements IUserService {
         return userJpaRepository.existsByEmail(email);
     }
 
-    private boolean validCredentials(RegisterCredentialsVO registerCredentialsVO) {
+    private boolean validCredentials(RegisterCredentialsVO registerCredentialsVO) throws StringResponse {
         if(!new EmailValidator().isValid(registerCredentialsVO.getEmail(), null)){
             return false;
         }
 
         if (registerCredentialsVO.getUserName().length() < 1 || registerCredentialsVO.getUserName().length() > 20){
             return false;
+        }
+
+        Zxcvbn passwordCheck = new Zxcvbn();
+        Strength strength = passwordCheck.measure(registerCredentialsVO.getPassword());
+        if (strength.getScore() < 2){
+            throw new StringResponse("Weak password");
         }
 
         boolean upper = false, lower = false, digit = false;

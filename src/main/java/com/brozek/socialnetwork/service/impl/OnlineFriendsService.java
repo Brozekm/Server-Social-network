@@ -77,8 +77,14 @@ public class OnlineFriendsService {
 
         simpMessagingTemplate.convertAndSendToUser(login, DESTINATION_ONLINE_FRIENDS, onlineFriendVOS);
 
-        if (onlineUsers.get(login) == null) {
-            onlineUsers.put(login, userName);
+        onlineUsers.putIfAbsent(login, userName);
+    }
+
+
+    public void notifyAfterFriendshipIfBothOnline(OnlineFriendVO first, OnlineFriendVO second){
+        if (this.onlineUsers.containsKey(first.getEmail()) && this.onlineUsers.containsKey(second.getEmail())){
+            this.simpMessagingTemplate.convertAndSendToUser(first.getEmail(), DESTINATION_ONLINE_FRIENDS, List.of(second));
+            this.simpMessagingTemplate.convertAndSendToUser(second.getEmail(), DESTINATION_ONLINE_FRIENDS, List.of(first));
         }
     }
 

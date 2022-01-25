@@ -55,4 +55,9 @@ public interface IFriendshipRepository extends JpaRepository<FriendshipDO, Integ
             "and (f.source.email = ?2 or f.target.email = ?2)")
     FriendshipDO getRelationshipByEmails(String first, String second);
 
+    @Query(value = "select f from friendship f join fetch f.source join fetch f.target " +
+            "where (f.source.email = ?1 or f.target.email = ?1) " +
+            "and (f.source.email = ?2 or f.target.email = ?2)")
+    FriendshipDO getRelationshipByEmailsFetchUsers(String first, String second);
+
 }
