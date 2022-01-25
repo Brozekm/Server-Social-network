@@ -2,6 +2,7 @@ package com.brozek.socialnetwork.controller;
 
 import com.brozek.socialnetwork.dos.auth.EnumAuthUserRole;
 import com.brozek.socialnetwork.service.IAdminService;
+import com.brozek.socialnetwork.vos.admin.ChangeRoleVO;
 import com.brozek.socialnetwork.vos.admin.EnumRoleAction;
 import com.brozek.socialnetwork.vos.admin.UserWithRolesVO;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +20,10 @@ public class AdminController {
 
     private final IAdminService adminService;
 
-    @PutMapping("/friend/add")
-    public ResponseEntity<?> addUserRole(@RequestParam String login, @RequestParam EnumAuthUserRole role){
+    @PutMapping("/friend/role/add")
+    public ResponseEntity<?> addUserRole(@RequestBody ChangeRoleVO changeRoleVO){
         try {
-            this.adminService.changeRole(login, EnumRoleAction.ADD, role);
+            this.adminService.changeRole(changeRoleVO.getUser(), EnumRoleAction.ADD, changeRoleVO.getRole());
             return ResponseEntity.ok().build();
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -31,10 +32,10 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/friend/remove")
-    public ResponseEntity<?> removeUserRole(@RequestParam String login, @RequestParam EnumAuthUserRole role){
+    @PutMapping("/friend/role/remove")
+    public ResponseEntity<?> removeUserRole(@RequestBody ChangeRoleVO changeRoleVO){
         try {
-            this.adminService.changeRole(login, EnumRoleAction.REMOVE, role);
+            this.adminService.changeRole(changeRoleVO.getUser(), EnumRoleAction.REMOVE, changeRoleVO.getRole());
             return ResponseEntity.ok().build();
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
