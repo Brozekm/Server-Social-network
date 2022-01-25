@@ -22,4 +22,8 @@ public interface IUserJpaRepository extends JpaRepository<AuthUserDO, Integer> {
     Optional<String> findUserNameByEmail(String email);
 
     List<AuthUserDO> findByEmailIn(List<String> emails);
+
+    @Query(value = "select distinct au from auth_user au join fetch au.roles " +
+            "where au.email in (?1)")
+    List<AuthUserDO> findByEmailAndFetchRoles(List<String> emails);
 }

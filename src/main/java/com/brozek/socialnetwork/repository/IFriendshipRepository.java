@@ -15,12 +15,13 @@ public interface IFriendshipRepository extends JpaRepository<FriendshipDO, Integ
             "where lower(au.user_name) like ?1 and (f.status is null or f.status = 'NEW') and (au.email != ?2)", nativeQuery = true)
     List<ISearchResultDO> searchForUsernameLike(String partName, String loggedUserEmail);
 
-    //TODO ADD STATUS
+
     @Query(value = "select au.email as email, au.user_name as userName from auth_user au " +
             "inner join friendship f on au.id = f.sourceid " +
             "and (select id from auth_user where email = ?1) = f.targetid " +
             "where f.status = 'NEW'", nativeQuery = true)
     List<ISearchResultDO> getUsersFriendshipRequest(String email);
+
 
     @Query(value = "select au.email as email, au.user_name as userName from auth_user au " +
             "inner join friendship f on au.id in (f.sourceid, f.targetid) " +

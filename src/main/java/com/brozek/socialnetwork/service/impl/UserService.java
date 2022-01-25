@@ -88,7 +88,7 @@ public class UserService implements IUserService {
     }
 
 
-    private AuthUserRoleDO getRoleFromEnum(EnumAuthUserRole role){
+    public AuthUserRoleDO getRoleFromEnum(EnumAuthUserRole role){
         if (this.authRoleMap == null){
             getRoles();
         }

@@ -35,6 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String LOGIN_URI = "/login";
     private static final String REGISTER_URI = "/register";
     private static final String EMAIL_VALID_URI = "/register/email";
+    private static final String ADMIN_URIS = "/api/admin/**";
 
     private static final String SOCKET_URI = "/ws/**";
 
@@ -64,6 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URI, REGISTER_URI).permitAll()
                 .and().authorizeRequests().antMatchers(HttpMethod.GET, EMAIL_VALID_URI).permitAll()
                 .antMatchers(SOCKET_URI).permitAll()
+                .antMatchers(ADMIN_URIS).hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()

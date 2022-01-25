@@ -77,4 +77,12 @@ public class AuthUserDO {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    public void addRole(final AuthUserRoleDO role) {
+        roles.add(role);
+    }
+
+    public boolean removeRole(final EnumAuthUserRole role) {
+        return roles.removeIf(userRole -> userRole.getRoleName() == role);
+    }
 }

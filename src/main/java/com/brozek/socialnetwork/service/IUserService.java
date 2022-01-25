@@ -1,5 +1,7 @@
 package com.brozek.socialnetwork.service;
 
+import com.brozek.socialnetwork.dos.auth.AuthUserRoleDO;
+import com.brozek.socialnetwork.dos.auth.EnumAuthUserRole;
 import com.brozek.socialnetwork.validation.exception.TakenEmailException;
 import com.brozek.socialnetwork.vos.EmailVO;
 import com.brozek.socialnetwork.vos.RegisterCredentialsVO;
@@ -13,4 +15,6 @@ public interface IUserService {
     void createUser(@Valid RegisterCredentialsVO RegisterCredentialsVO) throws TakenEmailException;
 
     boolean isEmailTaken(String email);
+
+    AuthUserRoleDO getRoleFromEnum(EnumAuthUserRole role);
 }
